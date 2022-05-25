@@ -89,9 +89,9 @@ type City struct {
 type Routes struct {
 	Success bool `json:"success"`
 	Data    struct {
-		Routes       []Route         `json:"routes"`
-		RoutesUsers  map[string]User `json:"routesUsers"`
-		RoutesCities map[string]City `json:"routesCities"`
+		Routes []Route         `json:"routes"`
+		Users  map[string]User `json:"routesUsers"`
+		Cities map[string]City `json:"routesCities"`
 	} `json:"data"`
 	Meta struct {
 		TotalCount CustomUint32 `json:"totalCount"`

@@ -1,6 +1,7 @@
 package edemrf
 
 import (
+	"fmt"
 	"net/url"
 	"path"
 )
@@ -16,4 +17,14 @@ func GetEndpoint(endpoint string) *url.URL {
 
 func GetImageFullUrl(relativeUrl string) string {
 	return WEB_SERVER_URL + relativeUrl
+}
+
+func GetBestQualityThumbUrl(user User) (string, error) {
+	thumbsRelUrls := [...]string{user.Thumbs.Maxres, user.Thumbs.Large, user.Thumbs.Medium, user.Thumbs.Small}
+	for _, thumbRelUrl := range thumbsRelUrls {
+		if thumbRelUrl != "" {
+			return GetImageFullUrl(thumbRelUrl), nil
+		}
+	}
+	return "", fmt.Errorf("no thumbs for user %v", user)
 }
