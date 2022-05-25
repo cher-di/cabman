@@ -10,12 +10,6 @@ import (
 	"time"
 )
 
-type Ruble uint32
-
-func (ruble Ruble) String() string {
-	return fmt.Sprintf("%d RUB", ruble)
-}
-
 type Route struct {
 	Id         string    `json:"id"`
 	UserId     string    `json:"userId"`
@@ -24,7 +18,7 @@ type Route struct {
 	ToCityId   string    `json:"toCityId"`
 	StartTime  time.Time `json:"startTime"`
 	EndTime    time.Time `json:"endTime"`
-	Cost       Ruble     `json:"Cost"`
+	Cost       uint32    `json:"Cost"`
 	FreePlaces uint8     `json:"freePlaces"`
 }
 
