@@ -89,10 +89,10 @@ type Routes struct {
 		RoutesCities map[string]City `json:"routesCities"`
 	}
 	Meta struct {
-		TotalCount uint32 `json:"totalCount"`
-		Page       uint32 `json:"page"`
-		PageSize   uint32 `json:"pageSize"`
-		PageCount  uint32 `json:"pageCount"`
+		TotalCount CustomUint32 `json:"totalCount"`
+		Page       CustomUint32 `json:"page"`
+		PageSize   CustomUint32 `json:"pageSize"`
+		PageCount  CustomUint32 `json:"pageCount"`
 	}
 }
 
