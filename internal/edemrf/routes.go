@@ -3,7 +3,6 @@ package edemrf
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -69,7 +68,13 @@ type User struct {
 	Id               string        `json:"id"`
 	Name             string        `json:"name"`
 	Rating           CustomFloat32 `json:"rating"`
-	imageRelativeUrl string        `json:"image"`
+	ImageRelativeUrl string        `json:"image"`
+	Thumbs           struct {
+		Maxres string `json:"maxres"`
+		Large  string `json:"large"`
+		Medium string `json:"medium"`
+		Small  string `json:"small"`
+	} `json:"thumbs"`
 }
 
 type City struct {
@@ -87,13 +92,13 @@ type Routes struct {
 		Routes       []Route         `json:"routes"`
 		RoutesUsers  map[string]User `json:"routesUsers"`
 		RoutesCities map[string]City `json:"routesCities"`
-	}
+	} `json:"data"`
 	Meta struct {
 		TotalCount CustomUint32 `json:"totalCount"`
 		Page       CustomUint32 `json:"page"`
 		PageSize   CustomUint32 `json:"pageSize"`
 		PageCount  CustomUint32 `json:"pageCount"`
-	}
+	} `json:"meta"`
 }
 
 func GetRoutes(fromCityId string, toCityId string, createdDate time.Time, PageSize uint32, page uint32) (Routes, error) {
@@ -106,7 +111,6 @@ func GetRoutes(fromCityId string, toCityId string, createdDate time.Time, PageSi
 	query.Set("page", strconv.Itoa(int(page)))
 	parsedUrl.RawQuery = query.Encode()
 	rawUrl := parsedUrl.String()
-	log.Printf("Result URL: %s", rawUrl)
 
 	client := &http.Client{}
 	req, err := http.NewRequest(http.MethodGet, rawUrl, nil)
