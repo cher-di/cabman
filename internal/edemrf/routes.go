@@ -7,36 +7,78 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 )
 
+type CustomTime struct {
+	Time time.Time
+}
+
+func (customTime *CustomTime) UnmarshalJSON(data []byte) error {
+	stringTime := strings.Trim(string(data), `"`)
+	parsedTime, err := time.Parse("2006-01-02 15:04:05", stringTime)
+	if err != nil {
+		return fmt.Errorf("failed to parse custom time: %v", err)
+	}
+	customTime.Time = parsedTime
+	return nil
+}
+
+type CustomUint32 struct {
+	Uint32 uint32
+}
+
+func (customUint32 *CustomUint32) UnmarshalJSON(data []byte) error {
+	stringUint32 := strings.Trim(string(data), `"`)
+	parsedUint32, err := strconv.ParseUint(stringUint32, 10, 32)
+	if err != nil {
+		return fmt.Errorf("failed to parse custom uint32: %v", err)
+	}
+	customUint32.Uint32 = uint32(parsedUint32)
+	return nil
+}
+
+type CustomFloat32 struct {
+	Float32 float32
+}
+
+func (customFloat32 *CustomFloat32) UnmarshalJSON(data []byte) error {
+	stringFloat32 := strings.Trim(string(data), `"`)
+	parsedFloat32, err := strconv.ParseFloat(stringFloat32, 32)
+	if err != nil {
+		return fmt.Errorf("failed to parse custom time: %v", err)
+	}
+	customFloat32.Float32 = float32(parsedFloat32)
+	return nil
+}
+
 type Route struct {
-	Id         string    `json:"id"`
-	UserId     string    `json:"userId"`
-	CarId      string    `json:"carId"`
-	FromCityId string    `json:"fromCityId"`
-	ToCityId   string    `json:"toCityId"`
-	StartTime  time.Time `json:"startTime"`
-	EndTime    time.Time `json:"endTime"`
-	Cost       uint32    `json:"Cost"`
-	FreePlaces uint8     `json:"freePlaces"`
+	Id         string       `json:"id"`
+	UserId     string       `json:"userId"`
+	CarId      string       `json:"carId"`
+	FromCityId string       `json:"fromCityId"`
+	ToCityId   string       `json:"toCityId"`
+	StartTime  CustomTime   `json:"startTime"`
+	EndTime    CustomTime   `json:"endTime"`
+	Cost       CustomUint32 `json:"Cost"`
+	FreePlaces CustomUint32 `json:"freePlaces"`
 }
 
 type User struct {
-	Id               string    `json:"id"`
-	Name             string    `json:"name"`
-	BirthDate        time.Time `json:"birthDate"`
-	Rating           float32   `json:"rating"`
-	imageRelativeUrl string    `json:"image"`
+	Id               string        `json:"id"`
+	Name             string        `json:"name"`
+	Rating           CustomFloat32 `json:"rating"`
+	imageRelativeUrl string        `json:"image"`
 }
 
 type City struct {
-	Id        string  `json:"id"`
-	CountryId string  `json:"countryId"`
-	RegionId  string  `json:"regionId"`
-	Name      string  `json:"name"`
-	Latitude  float32 `json:"lat"`
-	Longitude float32 `json:"lng"`
+	Id        string        `json:"id"`
+	CountryId string        `json:"countryId"`
+	RegionId  string        `json:"regionId"`
+	Name      string        `json:"name"`
+	Latitude  CustomFloat32 `json:"lat"`
+	Longitude CustomFloat32 `json:"lng"`
 }
 
 type Routes struct {
@@ -47,10 +89,10 @@ type Routes struct {
 		RoutesCities map[string]City `json:"routesCities"`
 	}
 	Meta struct {
-		TotalCount int `json:"totalCount"`
-		Page       int `json:"page"`
-		PageSize   int `json:"pageSize"`
-		PageCount  int `json:"pageCount"`
+		TotalCount uint32 `json:"totalCount"`
+		Page       uint32 `json:"page"`
+		PageSize   uint32 `json:"pageSize"`
+		PageCount  uint32 `json:"pageCount"`
 	}
 }
 
