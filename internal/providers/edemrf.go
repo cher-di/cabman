@@ -15,20 +15,20 @@ type EdemrfProvider struct {
 	UserId     string
 }
 
-func IsDatesEqual(date1, date2 time.Time) bool {
+func isDatesEqual(date1, date2 time.Time) bool {
 	y1, m1, d1 := date1.Date()
 	y2, m2, d2 := date2.Date()
 	return y1 == y2 && m1 == m2 && d1 == d2
 }
 
-func (provider *EdemrfProvider) IsRightRoute(route *edemrf.Route) bool {
+func (provider *EdemrfProvider) isRightRoute(route *edemrf.Route) bool {
 	return route.FromCityId == provider.FromCityId &&
 		route.ToCityId == provider.ToCityId &&
-		IsDatesEqual(route.StartTime.Time, provider.StartTime) &&
+		isDatesEqual(route.StartTime.Time, provider.StartTime) &&
 		route.UserId == provider.UserId
 }
 
-func MakeProviderRoute(data *edemrf.Routes, route *edemrf.Route) Route {
+func makeProviderRoute(data *edemrf.Routes, route *edemrf.Route) Route {
 	eDriver := data.Data.Users[route.UserId]
 	eFromCity := data.Data.Cities[route.FromCityId]
 	eToCity := data.Data.Cities[route.ToCityId]
@@ -58,8 +58,8 @@ func (provider *EdemrfProvider) FindRoute() (Route, error) {
 		}
 		pageCount = data.Meta.PageCount.Uint32
 		for _, route := range data.Data.Routes {
-			if provider.IsRightRoute(&route) {
-				return MakeProviderRoute(&data, &route), nil
+			if provider.isRightRoute(&route) {
+				return makeProviderRoute(&data, &route), nil
 			}
 		}
 	}
