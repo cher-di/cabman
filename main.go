@@ -17,9 +17,10 @@ const (
 )
 
 func main() {
+	tomorrow := time.Now().Add(time.Hour * 24)
 	provider := providers.EdemrfProvider{
 		FromCityId: PvkCityId, ToCityId: EkbCityId,
-		StartTime: time.Now(), UserId: Alexander}
+		StartTime: tomorrow, UserId: Alexander}
 	route, err := provider.FindRoute()
 	if err != nil {
 		log.Fatalf("failed to find route: %v", err)
