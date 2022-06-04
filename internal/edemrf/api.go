@@ -1,7 +1,10 @@
 package edemrf
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"net/url"
 	"path"
 	"strconv"
@@ -22,7 +25,44 @@ func GetImageFullUrl(relativeUrl string) string {
 	return WEB_SERVER_URL + relativeUrl
 }
 
-func GetBestQualityThumbUrl(user User) (string, error) {
+type reponseStatus struct {
+	Success bool `json:"success"`
+}
+
+func sendGetRequest(url string, resultStorage interface{}) error {
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return fmt.Errorf("failed to make request to %s: %v", url, err)
+	}
+	req.Header.Add("Accept", "application/json")
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to send request to %s: %v", url, err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("request to %s finished with unexpected status code %s", url, resp.Status)
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read response body from %s: %v", url, err)
+	}
+
+	var status reponseStatus
+	if err := json.Unmarshal(body, &status); err != nil {
+		return fmt.Errorf("failed to parse response status from url %s: %v", url, err)
+	}
+	if !status.Success {
+		return fmt.Errorf("request to %s was not successfull", url)
+	}
+	if err := json.Unmarshal(body, resultStorage); err != nil {
+		return fmt.Errorf("failed to parse response from %s: %v", url, err)
+	}
+	return nil
+}
+
+func GetBestQualityThumbUrl(user RUser) (string, error) {
 	thumbsRelUrls := [...]string{user.Thumbs.Maxres, user.Thumbs.Large, user.Thumbs.Medium, user.Thumbs.Small}
 	for _, thumbRelUrl := range thumbsRelUrls {
 		if thumbRelUrl != "" {

@@ -1,13 +1,11 @@
 package edemrf
 
 import (
-	"encoding/json"
 	"fmt"
-	"net/http"
 	"net/url"
 )
 
-type CityInfo struct {
+type City struct {
 	Id       string       `json:"id"`
 	Name     string       `json:"name"`
 	Locality string       `json:"locality"`
@@ -16,10 +14,10 @@ type CityInfo struct {
 }
 
 type Cities struct {
-	Success bool `json:"success"`
-	Data    struct {
-		Items []CityInfo `json:"items"`
-	}
+	reponseStatus
+	Data struct {
+		Items []City `json:"items"`
+	} `json:"data"`
 }
 
 func GetCities(cityName string) (Cities, error) {
@@ -27,27 +25,10 @@ func GetCities(cityName string) (Cities, error) {
 	query := url.Values{}
 	query.Set("searchQuery", cityName)
 	parsedUrl.RawQuery = query.Encode()
-	rawUrl := parsedUrl.String()
-
-	client := &http.Client{}
-	req, err := http.NewRequest(http.MethodGet, rawUrl, nil)
-	if err != nil {
-		return Cities{}, fmt.Errorf("failed to make request to %s: %v", rawUrl, err)
-	}
-	req.Header.Add("Accept", "application/json")
-	resp, err := client.Do(req)
-	if err != nil {
-		return Cities{}, fmt.Errorf("failed to send request to %s: %v", rawUrl, err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return Cities{}, fmt.Errorf("request to %s finished with unexpected status code %s", rawUrl, resp.Status)
-	}
 
 	var cities Cities
-	decoder := json.NewDecoder(resp.Body)
-	if err := decoder.Decode(&cities); err != nil {
-		return Cities{}, fmt.Errorf("failed to parse response from %s: %v", rawUrl, err)
+	if err := sendGetRequest(parsedUrl.String(), &cities); err != nil {
+		return Cities{}, fmt.Errorf("failed to get citites with city name %s: %v", cityName, err)
 	}
 	return cities, nil
 }

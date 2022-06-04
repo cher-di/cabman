@@ -1,9 +1,7 @@
 package edemrf
 
 import (
-	"encoding/json"
 	"fmt"
-	"net/http"
 	"net/url"
 	"strconv"
 	"time"
@@ -21,7 +19,7 @@ type Route struct {
 	FreePlaces CustomUint32 `json:"freePlaces"`
 }
 
-type User struct {
+type RUser struct {
 	Id               string        `json:"id"`
 	Name             string        `json:"name"`
 	Rating           CustomFloat32 `json:"rating"`
@@ -34,7 +32,7 @@ type User struct {
 	} `json:"thumbs"`
 }
 
-type City struct {
+type RCity struct {
 	Id        string        `json:"id"`
 	CountryId string        `json:"countryId"`
 	RegionId  string        `json:"regionId"`
@@ -44,11 +42,11 @@ type City struct {
 }
 
 type Routes struct {
-	Success bool `json:"success"`
-	Data    struct {
-		Routes []Route         `json:"routes"`
-		Users  map[string]User `json:"routesUsers"`
-		Cities map[string]City `json:"routesCities"`
+	reponseStatus
+	Data struct {
+		Routes []Route          `json:"routes"`
+		Users  map[string]RUser `json:"routesUsers"`
+		Cities map[string]RCity `json:"routesCities"`
 	} `json:"data"`
 	Meta struct {
 		TotalCount CustomUint32 `json:"totalCount"`
@@ -67,27 +65,10 @@ func GetRoutes(fromCityId string, toCityId string, createdDate time.Time, PageSi
 	query.Set("pageSize", strconv.Itoa(int(PageSize)))
 	query.Set("page", strconv.Itoa(int(page)))
 	parsedUrl.RawQuery = query.Encode()
-	rawUrl := parsedUrl.String()
-
-	client := &http.Client{}
-	req, err := http.NewRequest(http.MethodGet, rawUrl, nil)
-	if err != nil {
-		return Routes{}, fmt.Errorf("failed to make request to %s: %v", rawUrl, err)
-	}
-	req.Header.Add("Accept", "application/json")
-	resp, err := client.Do(req)
-	if err != nil {
-		return Routes{}, fmt.Errorf("failed to send request to %s: %v", rawUrl, err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return Routes{}, fmt.Errorf("request to %s finished with unexpected status code %s", rawUrl, resp.Status)
-	}
 
 	var routes Routes
-	decoder := json.NewDecoder(resp.Body)
-	if err := decoder.Decode(&routes); err != nil {
-		return Routes{}, fmt.Errorf("failed to parse response from %s: %v", rawUrl, err)
+	if err := sendGetRequest(parsedUrl.String(), &routes); err != nil {
+		return Routes{}, fmt.Errorf("failed to get routes: %v", err)
 	}
 	return routes, nil
 }
