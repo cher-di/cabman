@@ -6,7 +6,7 @@ import (
 	"path"
 )
 
-const API_SERVER_URL = "https://api.edemrf.com/v22"
+const API_SERVER_URL = "https://api.edemrf.com/v23"
 const WEB_SERVER_URL = "https://едем.рф"
 
 func GetEndpoint(endpoint string) *url.URL {
