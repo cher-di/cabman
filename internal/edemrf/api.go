@@ -15,13 +15,13 @@ import (
 const API_SERVER_URL = "https://api.edemrf.com/v23"
 const WEB_SERVER_URL = "https://едем.рф"
 
-func GetEndpoint(endpoint string) *url.URL {
+func getEndpoint(endpoint string) *url.URL {
 	parsedUrl, _ := url.Parse(API_SERVER_URL)
 	parsedUrl.Path = path.Join(parsedUrl.Path, endpoint)
 	return parsedUrl
 }
 
-func GetImageFullUrl(relativeUrl string) string {
+func getImageFullUrl(relativeUrl string) string {
 	return WEB_SERVER_URL + relativeUrl
 }
 
@@ -62,14 +62,8 @@ func sendGetRequest(url string, resultStorage interface{}) error {
 	return nil
 }
 
-func GetBestQualityThumbUrl(user RUser) (string, error) {
-	thumbsRelUrls := [...]string{user.Thumbs.Maxres, user.Thumbs.Large, user.Thumbs.Medium, user.Thumbs.Small}
-	for _, thumbRelUrl := range thumbsRelUrls {
-		if thumbRelUrl != "" {
-			return GetImageFullUrl(thumbRelUrl), nil
-		}
-	}
-	return "", fmt.Errorf("no thumbs for user %v", user)
+type WithThumbUrls interface {
+	GetBestQualityThumbUrl() (string, error)
 }
 
 type CustomTime struct {

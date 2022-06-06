@@ -5,8 +5,8 @@ import (
 	"net/url"
 )
 
-type City struct {
-	Id       string       `json:"id"`
+type CityItem struct {
+	Id       CustomUint32 `json:"id"`
 	Name     string       `json:"name"`
 	Locality string       `json:"locality"`
 	Address  string       `json:"address"`
@@ -16,12 +16,12 @@ type City struct {
 type Cities struct {
 	reponseStatus
 	Data struct {
-		Items []City `json:"items"`
+		Items []CityItem `json:"items"`
 	} `json:"data"`
 }
 
-func GetCities(cityName string) (Cities, error) {
-	parsedUrl := GetEndpoint("/cities")
+func GetCitiesSearchResutl(cityName string) (Cities, error) {
+	parsedUrl := getEndpoint("/cities")
 	query := url.Values{}
 	query.Set("searchQuery", cityName)
 	parsedUrl.RawQuery = query.Encode()
